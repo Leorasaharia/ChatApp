@@ -1,9 +1,14 @@
 const express = require("express");
 const cors = require("cors");
-const axios = require("axios"); 
+const axios = require("axios");
+const path = require("path");
+
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: true }));
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'frontend/build')));
 
 app.post("/authenticate", async (req, res) => {
   const { username } = req.body;
@@ -19,4 +24,12 @@ app.post("/authenticate", async (req, res) => {
   }
 });
 
-app.listen(3001);
+// Handles any requests that don't match the ones above
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
